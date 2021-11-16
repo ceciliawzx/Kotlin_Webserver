@@ -22,8 +22,7 @@ fun queryParams(url: String): List<Pair<String, String>> {
       val value = k_v.split('=')[1].toString()
       list = list.plus(Pair(key, value))
     }
-  }
-  else {
+  } else {
     return listOf()
   }
   return list
