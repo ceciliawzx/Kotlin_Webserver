@@ -1,7 +1,5 @@
 package webserver
 
-// write your web framework code here:
-
 fun scheme(url: String): String {
   return url.substringBefore(':')
 }
