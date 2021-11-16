@@ -55,7 +55,7 @@ class WebServerTest {
   @Test
   fun `can process multiple params`() {
     val request = Request("http://www.imperial.ac.uk/say-hello?name=Fred&style=shouting")
-    assertEquals("HELLO, FRED!", helloHandler(request).body)
+    assertEquals("Hello, Fred!", helloHandler(request).body)
   }
 
 // ***** Tests for Routing *****

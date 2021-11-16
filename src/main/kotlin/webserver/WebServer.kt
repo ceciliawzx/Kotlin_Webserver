@@ -33,7 +33,3 @@ fun queryParams(url: String): List<Pair<String, String>> {
 // http handlers for a particular website...
 
 fun homePageHandler(request: Request): Response = Response(Status.OK, "This is Imperial.")
-
-fun main() {
-  println(path("http://www.imperial.ac.uk/"))
-}

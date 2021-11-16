@@ -1,7 +1,5 @@
 package webserver
 
-import org.junit.Test
-
 // provided files
 
 class Request(val url: String, val authToken: String = "")
