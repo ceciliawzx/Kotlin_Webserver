@@ -9,6 +9,7 @@ class WebServerTest {
   fun `can extract scheme`() {
     assertEquals("http", scheme("http://www.imperial.ac.uk/"))
     assertEquals("https", scheme("https://www.imperial.ac.uk/"))
+    assertEquals("https", scheme("https://"))
   }
 
   @Test
@@ -16,6 +17,7 @@ class WebServerTest {
     assertEquals("www.imperial.ac.uk", host("http://www.imperial.ac.uk/"))
     assertEquals("www.imperial.ac.uk", host("https://www.imperial.ac.uk/"))
     assertEquals("www.imperial.ac.uk", host("https://www.imperial.ac.uk/computing"))
+    assertEquals("www.youtube.com", host("https://www.youtube.com"))
   }
 
   @Test
@@ -31,6 +33,7 @@ class WebServerTest {
   fun `can extract query params`() {
     assertEquals(listOf(Pair("q", "xxx")), queryParams("http://www.imperial.ac.uk/?q=xxx"))
     assertEquals(listOf(Pair("q", "xxx"), Pair("rr", "zzz")), queryParams("http://www.imperial.ac.uk/?q=xxx&rr=zzz"))
+    assertEquals(listOf(Pair("1", "shu"), Pair("a123", "123")), queryParams("https://www.idk.com/?1=shu&a123=123"))
   }
 
   @Test
@@ -81,33 +84,34 @@ class WebServerTest {
 
 // *** More flexible routing ***
 
-//  @Test
-//  fun `calling configureRoutes() returns app which can handle requests`() {
-//
-//    val app = configureRoutes(...)
-//
-//    assertEquals("This is Imperial.", app(Request("http://www.imperial.ac.uk/")).body)
-//    assertEquals("This is DoC.", app(Request("http://www.imperial.ac.uk/computing")).body)
-//  }
+  @Test
+  fun `calling configureRoutes() returns app which can handle requests`() {
+
+    val app = ::configureRoutes
+
+    assertEquals("This is Imperial.", app(Request("http://www.imperial.ac.uk/")).body)
+    assertEquals("This is DoC.", app(Request("http://www.imperial.ac.uk/computing")).body)
+    assertEquals("Hello, Fred!", app(Request("https://www.imperial.ac.uk/say-hello?name=Fred&111=222")).body)
+    assertEquals("Hello, World!", app(Request("https://www.imperial.ac.uk/hello-world")).body)
+  }
 
 //  *** Filters ***
 
 //  @Test
-//  fun `filter prevents access to protected resources `() {
-//
-//    val app = configureRoutes(...)
-//
-//    val request = Request("http://www.imperial.ac.uk/exam-marks")
-//    assertEquals(Status.FORBIDDEN, app(request).status)
-//  }
-//
-//  @Test
-//  fun `filter allows access to protected resources with token`() {
-//
-//    val app = configureRoutes(...)
-//
-//    val request = Request("http://www.imperial.ac.uk/exam-marks", "password1")
-//    assertEquals(Status.OK, app(request).status)
-//    assertEquals("This is very secret.", app(request).body)
-//  }
+  fun `filter prevents access to protected resources `() {
+
+    val app = ::configureRoutes
+    val request = Request("http://www.imperial.ac.uk/exam-marks")
+    assertEquals(Status.FORBIDDEN, app(request).status)
+  }
+
+  @Test
+  fun `filter allows access to protected resources with token`() {
+
+    val app = ::configureRoutes
+
+    val request = Request("http://www.imperial.ac.uk/exam-marks", "password1")
+    assertEquals(Status.OK, app(request).status)
+    assertEquals("This is very secret.", app(request).body)
+  }
 }

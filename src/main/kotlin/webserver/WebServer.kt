@@ -7,7 +7,7 @@ fun scheme(url: String): String {
 }
 
 fun host(url: String): String {
-  return url.substringBeforeLast('/').substringAfterLast('/')
+  return url.substringAfter("://").substringBefore('/')
 }
 
 fun path(url: String): String {

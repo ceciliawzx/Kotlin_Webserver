@@ -17,25 +17,59 @@ fun helloHandler(re: Request): Response {
   for (k_v in keyvalues) {
     if (k_v.first == "name") {
       val name = k_v.second
-      return Response(status = status, body = "Hello, $name!")
+      return Response(status, "Hello, $name!")
     }
   }
-  return Response(status = status)
+  return Response(status)
 }
 
-fun homeHandler(res: String): Response {
-  return Response(status = Status.OK, body = "This is $res.")
+fun homeHandler(re: Request): Response {
+  val res =
+    when (path(re.url)) {
+        "/" -> "Imperial"
+        "/computing" -> "DoC"
+        else -> "Nothing"
+    }
+  return Response(Status.OK, "This is $res.")
 }
 
 fun route(request: Request): Response {
   val url = request.url
   val path = path(url)
   if (path == "/say-hello") {
-    return helloHandler(Request(url = url))
-  } else if (path == "/") {
-    return homeHandler("Imperial")
-  } else if (path == "/computing") {
-    return homeHandler("DoC")
+    return helloHandler(Request(url))
+  } else if (path == "/computing" || path == "/") {
+    return homeHandler(Request(url))
   }
   return Response(Status.NOT_FOUND)
+}
+
+typealias HttpHandler = (Request) -> Response
+
+val configs = listOf<Pair<String, HttpHandler>>(
+  "/say-hello" to ::helloHandler,
+  "/" to ::homeHandler,
+  "/computing" to ::homeHandler,
+  "/exam-marks" to requireToken("password1", ::restrictedPageHandler)
+)
+
+fun configureRoutes(request: Request): Response {
+  val path = path(request.url)
+  for (config in configs) {
+    when (path) {
+        config.first -> return config.second(request)
+    }
+  }
+  return Response(Status.NOT_FOUND)
+}
+
+fun requireToken(token: String, wrapped: HttpHandler): HttpHandler {
+  return wrapped
+}
+
+fun restrictedPageHandler(request: Request): Response {
+  if (request.authToken == "password1") {
+    return Response(Status.OK, "This is very secret.")
+  }
+  return Response(Status.FORBIDDEN)
 }
