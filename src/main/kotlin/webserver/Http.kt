@@ -63,13 +63,19 @@ fun configureRoutes(request: Request): Response {
   return Response(Status.NOT_FOUND)
 }
 
+// closure
 fun requireToken(token: String, wrapped: HttpHandler): HttpHandler {
-  return wrapped
+  var xxxhandler : HttpHandler = {
+    println(it)
+    if (token == it.authToken) {
+      wrapped(it)
+    } else {
+      Response(Status.FORBIDDEN)
+    }
+  }
+  return xxxhandler
 }
 
 fun restrictedPageHandler(request: Request): Response {
-  if (request.authToken == "password1") {
-    return Response(Status.OK, "This is very secret.")
-  }
-  return Response(Status.FORBIDDEN)
+  return Response(Status.OK, "This is very secret.")
 }
